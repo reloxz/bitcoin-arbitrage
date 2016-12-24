@@ -1,99 +1,109 @@
 from .market import Market
-import time
-import base64
-import hmac
-import urllib.request
-import urllib.parse
-import urllib.error
-import urllib.request
-import urllib.error
-import urllib.parse
-import hashlib
-import sys
-import json
 import config
+from lib.exchange import exchange
+from lib.settings import KRN_API_URL
+import logging
 
-
-class PrivateBitfenix(Market):
-    balance_url = "https://bitfenix.com/api/v1/balances/"
-    trade_url = "https://paymium.com/api/v1/trade_orders/"
-    withdraw_url = "https://paymium.com/api/v1/transfers/send_bitcoins/"
-
+class PrivateKraken(Market):
     def __init__(self):
-        raise Exception("Paymium is closed")
         super().__init__()
-        self.api_key = config.bitfenix_api_key
-        self.api_secret = config.bitfenix_secret_key
+        if KRN_API_KEY == None:
+            KRN_API_KEY = config.kraken_api_key
+            KRN_SECRET_TOKEN = config.kraken_secret_key
+        self.market = exchange(KRN_API_URL,  KRN_API_KEY, KRN_SECRET_TOKEN,
+                               'krn')
         self.currency = "EUR"
         self.get_info()
 
-    def _create_nonce(self):
-        return int(time.time() * 1000000)
+    def _buy(self, amount, price):
+        response = self.market.buy(amount, price)
+        if response and "code" in response:
+            logging.warn(response)
+            return False
+        if not response:
+            return response
 
-    def _send_request(self, url, params=[], extra_headers=None):
-        headers = {
-            'Content-type': 'application/json',
-            'Accept': 'application/json, text/javascript, */*; q=0.01',
-            'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
-        }
-        if extra_headers is not None:
-            for k, v in extra_headers.items():
-                headers[k] = v
+        return response['order_id']
 
-        req = None
-        if params:
-            req = urllib.request.Request(
-                url, json.dumps(params), headers=headers)
+    def _sell(self, amount, price):
+        """Create a sell limit order"""
+        response = self.market.sell(amount, price)
+        if response and "code" in response:
+            logging.warn(response)
+            return False
+        if not response:
+            return response
+        return response['order_id']
+
+    def _buy_maker(self, amount, price):
+        response = self.market.bidMakerOnly(amount, price)
+        if response and "code" in response:
+            logging.warn(response)
+            return False
+        if not response:
+            return response
+
+        return response['order_id']
+
+    def _sell_maker(self, amount, price):
+        response = self.market.askMakerOnly(amount, price)
+        if response and "code" in response:
+            logging.warn(response)
+            return False
+        if not response:
+            return response
+
+        return response['order_id']
+
+    def _get_order(self, order_id):
+        response = self.market.orderInfo(order_id)
+        if not response:
+            return response
+
+        if "code" in response:
+            logging.warn(response)
+            return False
+
+        return response
+
+    def _cancel_order(self, order_id):
+        response = self.market.cancel(order_id)
+
+        if not response:
+            return response
+
+        if response and "code" in response:
+            logging.warn(response)
+            return False
+
+        resp_order_id = response['order_id']
+        if resp_order_id == -1:
+            logging.warn("cancel order #%s failed, %s" % (order_id, resp_order_id))
+            return False
         else:
-            req = urllib.request.Request(url, headers=headers)
-        userpass = '%s:%s' % (self.username, self.password)
-        base64string = base64.b64encode(bytes(
-            userpass, 'utf-8')).decode('ascii')
-        req.add_header("Authorization", "Basic %s" % base64string)
-        response = urllib.request.urlopen(req)
-        code = response.getcode()
-        if code == 200:
-            jsonstr = response.read().decode('utf-8')
-            return json.loads(jsonstr)
-        return None
+            logging.debug("Canceled order #%s ok" % (order_id))
+            return True
+        return True
 
-    def trade(self, amount, ttype, price=None):
-        # params = [("amount", amount), ("currency", self.currency), ("type",
-        # ttype)]
-        params = {"amount": amount, "currency": self.currency, "type": ttype}
-        if price:
-            params["price"] = price
-        response = self._send_request(self.trade_url, params)
+    def _cancel_all(self):
+        response = self.market.cancelAll()
+        if response and "code" in response:
+            logging.warn(response)
+            return False
         return response
 
-    def buy(self, amount, price=None):
-        response = self.trade(amount, "buy", price)
-
-    def sell(self, amount, price=None):
-        response = self.trade(amount, "sell", price)
-        print(response)
-
-    def withdraw(self, amount, address):
-        params = {"amount": amount, "address": address}
-        response = self._send_request(self.trade_url, params)
-        return response
-
-    def deposit(self):
-        return config.bitfenix_address
-
+    #FIXME: update exchange responses
     def get_info(self):
-        response = self._send_request(self.balance_url)
+        """Get balance"""
+        response = self.market.accountInfo()
         if response:
-            jsonify = json.load(response)
-            for r in jsonify:
-                print(r)
-                if r["currency"] is "btc":
-                    self.btc_balance = r["available"]
-            #self.btc_balance = response["BTC"]
-            #self.eur_balance = response["EUR"]
-            #self.usd_balance = self.fc.convert(self.eur_balance, "EUR", "USD")
+            if "code" in response:
+                logging.warn("get_info failed %s", response)
+                return False
+            else:
+                self.btc_balance = float(response["exchange_btc"])
+                self.cny_balance = float(response["exchange_cny"])
+                self.btc_frozen = float(response["exchange_frozen_btc"])
+                self.cny_frozen = float(response["exchange_frozen_cny"])
 
-if __name__ == "__main__":
-    market = PrivateBitfenix()
-    market.get_info()
-    print(market)
+        return response

@@ -2,22 +2,22 @@ import logging
 import config
 import time
 from .observer import Observer
-from private_markets import mtgox
-from private_markets import paymium
+from private_markets import bitfenix
+from private_markets import kraken
 from .emailer import send_email
 
 
-class SpecializedTraderBot(Observer):
+class SpecializedTraderBot2(Observer):
     def __init__(self):
-        self.mtgox = mtgox.PrivateMtGox()
-        self.btcentral = paymium.PrivatePaymium()
+        self.btfenix = bitfenix.PrivateBitfenix()
+        self.kraken = kraken.PrivateKraken()
         self.clients = {
-            "MtGoxEUR": self.mtgox,
-            "PaymiumEUR": self.btcentral,
+            "Bitfenix": self.btfenix,
+            "Kraken": self.kraken,
         }
         self.profit_percentage_thresholds = {  # Graph
-            "MtGoxEUR": {"PaymiumEUR": 3.5},
-            "PaymiumEUR": {"MtGoxEUR": 1},
+            "Bitfenix": {"Kraken": 1.5},
+            "PaymiumEUR": {"Bitfenix": 1},
         }
         self.trade_wait = 60 * 5  # in seconds
         self.last_trade = 0

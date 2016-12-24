@@ -54,7 +54,13 @@ OKCOIN_API_URL = {
 OKCOIN_MIN_TRADE = {'buy':0.01,'sell':0.01 , 'trade':0.01}
 OKCOIN_API = {'max_open_order':50,'fee':0.004}
 
+BTFNX_API_URL = {
 
+}
+
+KRN_API_URL = {
+
+}
 #IMPORT local_settings
 try:
     from .local_settings import *
