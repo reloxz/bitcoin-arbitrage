@@ -1,23 +1,21 @@
 markets = [
-    # "BitfinexUSD",
-    # "BitstampUSD",
-    # "BTCCCNY",
-    # "BtceEUR",
-    # "BtceUSD",
-    # "CampBXUSD",
-    # "CoinbaseUSD",
-    # "GeminiUSD",
-    # "KrakenEUR",
-    # "KrakenUSD",
-    # "OKCoinCNY",
-    "HaobtcCNY",
-    # "HuobiCNY",
-    # "PaymiumEUR",
+    "BitfinexUSD",
+    "BitstampUSD",
+    "BTCCCNY",
+    "BtceEUR",
+    "BtceUSD",
+    "CampBXUSD",
+    "CoinbaseUSD",
+    "GeminiUSD",
+    "KrakenEUR",
+    "KrakenUSD",
+    "OKCoinCNY",
+    "PaymiumEUR",
 ]
 
 # observers if any
-# ["Logger", "DetailedLogger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer", "SpecializedTraderBot"]
-observers = ["DetailedLogger", "TraderBotSim"]
+# ["Logger", "DetailedLogger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer"]
+observers = ["DetailedLogger"]
 
 market_expiration_time = 120  # in seconds: 2 minutes
 
@@ -69,26 +67,6 @@ cny_init = 60000000000
 btc_init = 1200000
 price_init = 4450
 
-# Emailer Observer Config
-send_trade_mail = False
-
-EMAIL_HOST = 'mail.FIXME.com'
-EMAIL_HOST_USER = 'FIXME@FIXME.com'
-EMAIL_HOST_PASSWORD = 'FIXME'
-EMAIL_USE_TLS = True
-
-EMAIL_RECEIVER = ['FIXME@FIXME.com']
-
-
-# XMPP Observer
-xmpp_jid = "FROM@jabber.org"
-xmpp_password = "FIXME"
-xmpp_to = "TO@jabber.org"
-
-# broker thrift server
-BROKER_HOST = "127.0.0.1"
-BROKER_PORT = 18030
-
 # Trader Bot Config
 # Access to Private APIs
 
@@ -98,6 +76,10 @@ paymium_address = "FIXME"  # to deposit btc from markets / wallets
 
 bitstamp_username = "FIXME"
 bitstamp_password = "FIXME"
+
+
+bitfenix_api_key = ""
+bitfenix_secret_key = ""
 
 HUOBI_API_KEY = ''
 HUOBI_SECRET_TOKEN = ''
@@ -114,3 +96,27 @@ try:
     from config_local import *
 except ImportError:
     pass
+
+# SafeGuards
+max_tx_volume = 10  # in BTC
+min_tx_volume = 1  # in BTC
+balance_margin = 0.05  # 5%
+profit_thresh = 1  # in EUR
+perc_thresh = 2  # in %
+
+# Emailer Observer Config
+EMAIL_HOST = 'mail.FIXME.com'
+EMAIL_HOST_USER = 'FIXME@FIXME.com'
+EMAIL_HOST_PASSWORD = 'FIXME'
+EMAIL_USE_TLS = True
+
+EMAIL_RECEIVER = ['FIXME@FIXME.com']
+
+# XMPP Observer
+xmpp_jid = "FROM@jabber.org"
+xmpp_password = "FIXME"
+xmpp_to = "TO@jabber.org"
+
+# broker thrift server
+BROKER_HOST = "127.0.0.1"
+BROKER_PORT = 18030

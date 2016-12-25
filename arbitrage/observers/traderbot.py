@@ -4,7 +4,7 @@ import time
 from .observer import Observer
 from .emailer import send_email
 from fiatconverter import FiatConverter
-from private_markets import huobicny, okcoincny, brokercny
+from private_markets import huobicny, okcoincny, brokercny, bitfenix, kraken
 import os
 import time
 import sys
@@ -19,9 +19,11 @@ class TraderBot(BasicBot):
 
         self.clients = {
             # "HaobtcCNY": haobtccny.PrivateHaobtcCNY(config.HAOBTC_API_KEY, config.HAOBTC_SECRET_TOKEN),
-            "OKCoinCNY": okcoincny.PrivateOkCoinCNY(config.OKCOIN_API_KEY, config.OKCOIN_SECRET_TOKEN),
-            "HuobiCNY": huobicny.PrivateHuobiCNY(config.HUOBI_API_KEY, config.HUOBI_SECRET_TOKEN),
-            "BrokerCNY": brokercny.PrivateBrokerCNY(),
+            # "OKCoinCNY": okcoincny.PrivateOkCoinCNY(config.OKCOIN_API_KEY, config.OKCOIN_SECRET_TOKEN),
+            # "HuobiCNY": huobicny.PrivateHuobiCNY(config.HUOBI_API_KEY, config.HUOBI_SECRET_TOKEN),
+            # "BrokerCNY": brokercny.PrivateBrokerCNY(),
+            "Bitfenix": bitfenix.PrivateBitfenix(config.bitfenix_api_key, config.bitfenix_secret_key),
+            "Kraken": kraken.PrivateKraken(config.kraken_api_key, config.kraken_secret_key)
         }
 
         self.reverse_profit_thresh = config.reverse_profit_thresh
@@ -30,9 +32,10 @@ class TraderBot(BasicBot):
         self.perc_thresh = config.perc_thresh
         self.trade_wait = config.trade_wait  # in seconds
         self.last_trade = 0
-
-        self.init_btc = {'OKCoinCNY': 500, 'HuobiCNY': 500}
-        self.init_cny = {'OKCoinCNY': 100, 'HuobiCNY': 100}
+        self.init_eur = {'Bitfenix': 5, 'Kraken' : 5}
+        self.init_btc = {'Bitfenix': 500, 'Kraken': 500}
+        # self.init_btc = {'OKCoinCNY': 500, 'HuobiCNY': 500}
+        # self.init_cny = {'OKCoinCNY': 100, 'HuobiCNY': 100}
 
         self.stage0_percent = config.stage0_percent
         self.stage1_percent = config.stage1_percent
