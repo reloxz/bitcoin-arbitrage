@@ -123,4 +123,4 @@ BROKER_PORT = 18030
 
 
 #Added currency
-currency='EUR'
+btfnx_symbol='btcusd'

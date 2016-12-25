@@ -101,10 +101,16 @@ class exchange:
 
     def sell(self, amount, price, tradePassword=None, tradeid=None, type=None):
         if self.role == 'btfnx':
-            payload = {'symbol': config.currency, 'amount': amount, 'price': price,
-                       'side': 'buy', 'type': type}
-            payload = tradeLoad(payload, self.secretToken, self.role)
-            return requestPost(self.url['new_order'], payload)
+            payload = {'request': self.trim_uri(self.url['new_order']),
+                       'nonce': self._create_nonce(),
+                       'symbol': config.btfnx_symbol,
+                       'amount': amount,
+                       'price': price,
+                       'side': 'sell',
+                       'type': type
+                       }
+            signedPayload = self.create_bfnx_payload(payload)
+            return requestPost(self.url['new_order'], payload, headers=signedPayload)
 
         if self.role == 'haobtc' or self.role == 'default':
             payload = {'amount': amount, 'price': price, 'api_key': self.apikey,
