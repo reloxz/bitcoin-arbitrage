@@ -1,7 +1,7 @@
 from .market import Market
 import config
-from ..lib.exchange import exchange
-from ..lib.settings import KRN_API_URL
+from lib.exchange import exchange
+from lib.settings import KRN_API_URL
 import logging
 
 
@@ -70,7 +70,6 @@ class PrivateKraken(Market):
 
     def _cancel_order(self, order_id):
         response = self.market.cancel(order_id)
-
         if not response:
             return response
 
@@ -86,7 +85,6 @@ class PrivateKraken(Market):
         else:
             logging.debug("Canceled order #%s ok" % (order_id))
             return True
-        return True
 
     def _cancel_all(self):
         response = self.market.cancelAll()
@@ -104,9 +102,10 @@ class PrivateKraken(Market):
                 logging.warning("get_info failed %s", response)
                 return False
             else:
-                self.btc_balance = float(response["exchange_btc"])
-                self.cny_balance = float(response["exchange_cny"])
-                self.btc_frozen = float(response["exchange_frozen_btc"])
-                self.cny_frozen = float(response["exchange_frozen_cny"])
 
+                # self.btc_balance = float(response[""])
+                # self.cny_balance = float(response["exchange_cny"])
+                # self.btc_frozen = float(response["exchange_frozen_btc"])
+                # self.cny_frozen = float(response["exchange_frozen_cny"])
+                print(response.values())
         return response

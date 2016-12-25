@@ -1,5 +1,7 @@
 from .helpers import *
 import config
+import urllib.parse as urlparse
+
 
 class exchange:
 
@@ -13,8 +15,11 @@ class exchange:
         self.apikey = apiKey
         self.secretToken = secretToken
         self.role = role
+
     def _create_nonce(self):
         return str(time.time() * 1000000)
+    def _create_nonce_int(self):
+        return int(time.time()*1000)
 
     def market(self):
         return self.role
@@ -77,7 +82,7 @@ class exchange:
             if tradeid:
                 params['trade_id'] = tradeid
 
-            payload = urllib.parse.urlencode(params)
+            payload = urlparse.urlencode(params)
             r = requests.post("http://" + self.url['host'], params=payload)
             if r.status_code == 200:
                 data = r.json()
@@ -99,8 +104,11 @@ class exchange:
             payload = tradeLoad(payload, self.secretToken, self.role)
             return requestPost(self.url['trade'], payload)
 
+
+
+
     def sell(self, amount, price, tradePassword=None,
-             tradeid=None, type=None):
+             tradeid=None, type='market'):
         # BTFNX
         if self.role == 'btfnx':
             payload = {'request': self.trim_uri(self.url['new_order']),
@@ -114,8 +122,14 @@ class exchange:
             signedPayload = self.create_bfnx_payload(payload)
             return requestPost(self.url['new_order'], payload, headers=signedPayload)
         # KRN
-        if self.role = 'krn':
-            payload ={}
+        if self.role == 'krn':
+            payload ={
+                'pair': config.krn_pair,
+                'ordertype': type,
+                'volume': amount,
+                'type': 'sell',
+                'nonce': self._create_nonce()
+            }
             signedPayload = self.create_krn_payload(payload)
             return requestPost(self.url['new_order'], payload,
                                headers=signedPayload)
@@ -162,7 +176,7 @@ class exchange:
             if tradeid:
                 params['trade_id'] = tradeid
 
-            payload = urllib.parse.urlencode(params)
+            payload = urlparse.urlencode(params)
             r = requests.post("http://" + self.url['host'], params=payload)
             if r and r.status_code == 200:
                 data = r.json()
@@ -208,7 +222,7 @@ class exchange:
             sign = signature(params)
             params['sign'] = sign
             del params['secret_key']
-            payload = urllib.parse.urlencode(params)
+            payload = urlparse.urlencode(params)
             r = requests.post("http://" + self.url['host'], params=payload)
             if r.status_code == 200:
                 data = r.json()
@@ -254,7 +268,7 @@ class exchange:
             sign = signature(params)
             params['sign'] = sign
             del params['secret_key']
-            payload = urllib.parse.urlencode(params)
+            payload = urlli(params)
             r = requests.post("http://" + self.url['host'], params=payload)
             if r.status_code == 200:
                 data = r.json()
@@ -294,7 +308,7 @@ class exchange:
             sign = signature(params)
             params['sign'] = sign
             del params['secret_key']
-            payload = urllib.parse.urlencode(params)
+            payload = urlparse.urlencode(params)
             r = requests.post("http://" + self.url['host'], params=payload)
             if r.status_code == 200:
                 data = r.json()
@@ -350,7 +364,7 @@ class exchange:
             sign = signature(params)
             params['sign'] = sign
             del params['secret_key']
-            payload = urllib.parse.urlencode(params)
+            payload = urlparse.urlencode(params)
             r = requests.post("http://" + self.url['host'], params=payload)
             if r.status_code == 200:
                 data = r.json()
@@ -403,10 +417,6 @@ class exchange:
             payload = {'api_key': self.apikey, 'size': size}
             payload = tradeLoad(payload, self.secretToken, self.role)
             return requestPost(self.url['history_info'], payload)
-
-        if self.role == '':
-            return
-
         if self.role == '':
             return
 
@@ -420,6 +430,29 @@ class exchange:
                 'X-BFX-PAYLOAD': data,
                 'X-BFX-SIGNATURE': sha384(data, self.secretToken)
                 }
+    def create_krn_payload(self, payload, uri):
+        payload['nonce'] = self._create_nonce_int()
+        postdata = urlparse.urlencode(payload)
+        encoded = (str(payload['nonce']) + postdata).encode()
+        message = uri.encode() + hashlib.sha256(encoded).digest()
+
+        signature = hmac.new(base64.b64decode(self.secretToken),
+                             message, hashlib.sha512)
+        sigdigest = base64.b64encode(signature.digest())
+        # j = (str(payload['nonce']) + payload).encode()
+        # j = json.dumps(payload)
+        # j = (str(j['nonce'])+j).encode()
+
+        # decodedSecret = base64.b64decode(self.secretToken)
+        # payload1 = hashlib.sha256(j).digest()
+        # payload2 = uri.encode() + payload1
+        # sig = hmac.new(decodedSecret, payload2, hashlib.sha512).digest()
+
+        return {
+            'API-Key': self.apikey,
+            'API-Sign': sigdigest.decode(),
+        }
+
 
     def accountInfo(self):
         if self.role == 'btfnx':
@@ -429,6 +462,12 @@ class exchange:
             }
             signedPayload = self.create_bfnx_payload(payload)
             return requestPost(self.url['balance'], payload, headers=signedPayload)
+
+        if self.role == 'krn':
+            payload = {}
+            signedPayload = self.create_krn_payload(payload, self.trim_uri(self.url['balance']))
+            return requestPost(self.url['balance'], payload, headers=signedPayload)
+
         if self.role == 'haobtc' or self.role == 'default':
             payload = {'api_key': self.apikey}
             payload = tradeLoad(payload, self.secretToken, self.role)
@@ -452,7 +491,7 @@ class exchange:
             sign = signature(params)
             params['sign'] = sign
             del params['secret_key']
-            payload = urllib.parse.urlencode(params)
+            payload = urlparse.urlencode(params)
             r = requests.post("http://" + self.url['host'], params=payload)
             if r.status_code == 200:
                 data = r.json()
@@ -461,6 +500,13 @@ class exchange:
                 return None
 
     def ticker(self, symbol=''):
+        if self.role == 'btfnx':
+            params = {'symbol': config.btfnx_symbol}
+            return requestGet(self.url['ticker'], params)
+
+        if self.role == 'krn':
+            params = {'pair': config.krn_pair}
+            return requestGet(self.url['ticker', params])
 
         if self.role == 'haobtc' or self.role == 'default':
             return requestGet(self.url['ticker'])
