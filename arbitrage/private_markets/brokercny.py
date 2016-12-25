@@ -29,7 +29,7 @@ class PrivateBrokerCNY(Market):
         try:
             self.load()
         except IOError:
-            logging.warn("load client id failed!")
+            logging.warning("load client id failed!")
             pass
 
     def load(self):

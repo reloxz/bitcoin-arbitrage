@@ -21,7 +21,7 @@ def init_broker():
                              trans_factory=TFramedTransportFactory(),
                              timeout=60000)
     except Exception as e:
-        logging.warn("make_client exception")
+        logging.warning("make_client exception")
         traceback.print_exc()
 
 

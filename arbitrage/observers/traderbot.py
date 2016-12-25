@@ -83,7 +83,7 @@ class TraderBot(BasicBot):
                                                                      'id'])
                 logging.debug(result)
                 if not result:
-                    logging.warn("get_order buy #%s failed" %
+                    logging.warning("get_order buy #%s failed" %
                                  (buy_order['id']))
                     continue
 
@@ -102,7 +102,7 @@ class TraderBot(BasicBot):
                         ask_price = int(depths[buy_order['market']][
                                         "asks"][0]['price'])
                     except Exception as ex:
-                        logging.warn("exception depths:%s" % ex)
+                        logging.warning("exception depths:%s" % ex)
                         traceback.print_exc()
                         continue
 
@@ -123,7 +123,7 @@ class TraderBot(BasicBot):
                                                                       'id'])
                 logging.debug(result)
                 if not result:
-                    logging.warn("get_order sell #%s failed" %
+                    logging.warning("get_order sell #%s failed" %
                                  (sell_order['id']))
                     continue
 
@@ -142,7 +142,7 @@ class TraderBot(BasicBot):
                         bid_price = int(depths[sell_order['market']][
                                         "bids"][0]['price'])
                     except Exception as ex:
-                        logging.warn("exception depths:%s" % ex)
+                        logging.warning("exception depths:%s" % ex)
                         traceback.print_exc()
                         continue
 
@@ -157,21 +157,21 @@ class TraderBot(BasicBot):
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid, perc,
                     weighted_buyprice, weighted_sellprice):
         if kask not in self.clients:
-            logging.warn(
+            logging.warning(
                 "Can't automate this trade, client not available: %s" % kask)
             return
         if kbid not in self.clients:
-            logging.warn(
+            logging.warning(
                 "Can't automate this trade, client not available: %s" % kbid)
             return
 
         if self.buying_len() >= config.ARBITRAGER_BUY_QUEUE:
-            logging.warn(
+            logging.warning(
                 "Can't automate this trade, BUY queue is full: %s" % self.buying_len())
             return
 
         if self.selling_len() >= config.ARBITRAGER_SELL_QUEUE:
-            logging.warn(
+            logging.warning(
                 "Can't automate this trade, SELL queue is full: %s" % self.selling_len())
             return
 
@@ -209,7 +209,7 @@ class TraderBot(BasicBot):
             return
 
         if perc > 20:  # suspicous profit, added after discovering btc-central may send corrupted order book
-            logging.warn("Profit=%f seems malformed" % (perc, ))
+            logging.warning("Profit=%f seems malformed" % (perc, ))
             return
 
         max_volume = self.get_min_tradeable_volume(buyprice,
@@ -218,13 +218,13 @@ class TraderBot(BasicBot):
                                                    self.clients[kbid].btc_balance)
         volume = min(volume, max_volume, arbitrage_max_volume)
         if volume < config.min_tx_volume:
-            logging.warn("Can't automate this trade, minimum volume transaction" +
+            logging.warning("Can't automate this trade, minimum volume transaction" +
                          " not reached %f/%f" % (volume, config.min_tx_volume))
             return
 
         current_time = time.time()
         if current_time - self.last_trade < self.trade_wait:
-            logging.warn("Can't automate this trade, last trade " +
+            logging.warning("Can't automate this trade, last trade " +
                          "occured %.2f seconds ago" %
                          (current_time - self.last_trade))
             return
@@ -238,11 +238,11 @@ class TraderBot(BasicBot):
         volume = float('%0.2f' % volume)
 
         if self.clients[kask].cny_balance < max(volume * buyprice * 10, 31 * buyprice):
-            logging.warn("%s cny is insufficent" % kask)
+            logging.warning("%s cny is insufficent" % kask)
             return
 
         if self.clients[kbid].btc_balance < max(volume * 10, 31):
-            logging.warn("%s btc is insufficent" % kbid)
+            logging.warning("%s btc is insufficent" % kbid)
             return
 
         logging.info("Fire:Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" %
@@ -263,7 +263,7 @@ class TraderBot(BasicBot):
             result = self.new_order(
                 kask, 'buy', maker_only=False, amount=volume, price=buyprice)
             if not result:
-                logging.warn("Buy @%s %f BTC failed" % (kask, volume))
+                logging.warning("Buy @%s %f BTC failed" % (kask, volume))
                 return
 
             self.last_trade = time.time()
@@ -271,18 +271,18 @@ class TraderBot(BasicBot):
             result = self.new_order(
                 kbid, 'sell', maker_only=False, amount=volume,  price=sellprice)
             if not result:
-                logging.warn("Sell @%s %f BTC failed" % (kbid, volume))
+                logging.warning("Sell @%s %f BTC failed" % (kbid, volume))
                 result = self.new_order(
                     kask, 'sell', maker_only=False, amount=volume, price=buyprice)
                 if not result:
-                    logging.warn("2nd sell @%s %f BTC failed" % (kask, volume))
+                    logging.warning("2nd sell @%s %f BTC failed" % (kask, volume))
                     return
         else:
 
             result = self.new_order(
                 kbid, 'sell', maker_only=False, amount=volume,  price=sellprice)
             if not result:
-                logging.warn("Sell @%s %f BTC failed" % (kbid, volume))
+                logging.warning("Sell @%s %f BTC failed" % (kbid, volume))
                 return
 
             self.last_trade = time.time()
@@ -290,10 +290,10 @@ class TraderBot(BasicBot):
             result = self.new_order(
                 kask, 'buy', maker_only=False, amount=volume, price=buyprice)
             if not result:
-                logging.warn("Buy @%s %f BTC failed" % (kask, volume))
+                logging.warning("Buy @%s %f BTC failed" % (kask, volume))
                 result = self.new_order(
                     kbid, 'buy', maker_only=False, amount=volume,  price=sellprice)
                 if not result:
-                    logging.warn("2nd buy @%s %f BTC failed" % (kbid, volume))
+                    logging.warning("2nd buy @%s %f BTC failed" % (kbid, volume))
                     return
         return

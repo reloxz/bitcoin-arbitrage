@@ -57,12 +57,12 @@ class BasicBot(Observer):
                     order_id = self.clients[kexchange].sell(amount, price)
 
             if not order_id:
-                logging.warn("%s @%s %f/%f BTC failed" %
+                logging.warning("%s @%s %f/%f BTC failed" %
                              (type, kexchange, amount, price))
                 return None
 
             if order_id == -1:
-                logging.warn("%s @%s %f/%f BTC failed, %s" %
+                logging.warning("%s @%s %f/%f BTC failed, %s" %
                              (type, kexchange, amount, price, order_id))
                 return None
 
@@ -87,7 +87,7 @@ class BasicBot(Observer):
     def cancel_order(self, kexchange, type, order_id):
         result = self.clients[kexchange].cancel_order(order_id)
         if not result:
-            logging.warn("cancel %s #%s failed" % (type, order_id))
+            logging.warning("cancel %s #%s failed" % (type, order_id))
             return False
         else:
             return True

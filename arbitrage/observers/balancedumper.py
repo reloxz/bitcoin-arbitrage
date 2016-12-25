@@ -73,16 +73,16 @@ class BalanceDumper(Observer):
             bid_price = int(depths[self.exchange]["bids"][0]['price'])
             ask_price = int(depths[self.exchange]["asks"][0]['price'])
         except Exception as ex:
-            logging.warn("exception depths:%s" % ex)
+            logging.warning("exception depths:%s" % ex)
             t, v, tb = sys.exc_info()
             print(t, v)
             traceback.print_exc()
 
-            # logging.warn(depths)
+            # logging.warning(depths)
             return
 
         if bid_price == 0 or ask_price == 0:
-            logging.warn("exception ticker")
+            logging.warning("exception ticker")
             return
 
         cny_abs = abs(self.cny_total - self.cny_balance_total(bid_price))

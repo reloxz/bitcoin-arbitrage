@@ -22,7 +22,7 @@ class PrivateBitfenix(Market):
     def _buy(self, amount, price):
         response = self.market.buy(amount, price)
         if response and "code" in response:
-            logging.warn(response)
+            logging.warning(response)
             return False
         if not response:
             return response
@@ -33,7 +33,7 @@ class PrivateBitfenix(Market):
         """Create a sell limit order"""
         response = self.market.sell(amount, price)
         if response and "code" in response:
-            logging.warn(response)
+            logging.warning(response)
             return False
         if not response:
             return response
@@ -42,7 +42,7 @@ class PrivateBitfenix(Market):
     def _buy_maker(self, amount, price):
         response = self.market.bidMakerOnly(amount, price)
         if response and "code" in response:
-            logging.warn(response)
+            logging.warning(response)
             return False
         if not response:
             return response
@@ -52,7 +52,7 @@ class PrivateBitfenix(Market):
     def _sell_maker(self, amount, price):
         response = self.market.askMakerOnly(amount, price)
         if response and "code" in response:
-            logging.warn(response)
+            logging.warning(response)
             return False
         if not response:
             return response
@@ -65,7 +65,7 @@ class PrivateBitfenix(Market):
             return response
 
         if "code" in response:
-            logging.warn(response)
+            logging.warning(response)
             return False
 
         return response
@@ -77,12 +77,12 @@ class PrivateBitfenix(Market):
             return response
 
         if response and "code" in response:
-            logging.warn(response)
+            logging.warning(response)
             return False
 
         resp_order_id = response['order_id']
         if resp_order_id == -1:
-            logging.warn("cancel order #%s failed, %s" %
+            logging.warning("cancel order #%s failed, %s" %
                          (order_id, resp_order_id))
             return False
         else:
@@ -93,7 +93,7 @@ class PrivateBitfenix(Market):
     def _cancel_all(self):
         response = self.market.cancelAll()
         if response and "code" in response:
-            logging.warn(response)
+            logging.warning(response)
             return False
         return response
 
@@ -103,7 +103,7 @@ class PrivateBitfenix(Market):
         response = self.market.accountInfo()
         if response:
             if "code" in response:
-                logging.warn("get_info failed %s", response)
+                logging.warning("get_info failed %s", response)
                 return False
             else:
                 self.btc_balance = float(response["exchange_btc"])

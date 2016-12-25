@@ -41,7 +41,7 @@ class Arbitrer(object):
             except (ImportError, AttributeError) as e:
                 print("%s market name is invalid: Ignored (you should check your config file)" % (
                     market_name))
-                logging.warn("exception import:%s" % e)
+                logging.warning("exception import:%s" % e)
                 traceback.print_exc()
 
     def init_observers(self, _observers):
@@ -103,7 +103,7 @@ class Arbitrer(object):
                 w_sellprice = (w_sellprice * (
                     sell_total - amount) + price * amount) / sell_total
         if abs(sell_total - buy_total) > 0.00001:
-            logging.warn("sell_total=%s,buy_total=%s", sell_total, buy_total)
+            logging.warning("sell_total=%s,buy_total=%s", sell_total, buy_total)
 
         profit = sell_total * w_sellprice - buy_total * w_buyprice
         return profit, sell_total, w_buyprice, w_sellprice

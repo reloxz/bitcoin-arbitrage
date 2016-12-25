@@ -185,8 +185,8 @@ class ArbitrerCLI:
         Rthandler.setFormatter(formatter)
         logging.getLogger('').addHandler(Rthandler)
 
-        logging.getLogger("requests").setLevel(logging.WARNING)
-        logging.getLogger("urllib3").setLevel(logging.WARNING)
+        logging.getLogger("requests").setLevel(logging.warningING)
+        logging.getLogger("urllib3").setLevel(logging.warningING)
 
     def main(self):
         parser = argparse.ArgumentParser()

@@ -35,7 +35,7 @@ class PrivateHuobiCNY(Market):
         """Create a buy limit order"""
         response = self.market.buy(amount, price)
         if response and "code" in response:
-            logging.warn("buy ex:%s", response)
+            logging.warning("buy ex:%s", response)
             return False
 
         if not response:
@@ -47,7 +47,7 @@ class PrivateHuobiCNY(Market):
         """Create a sell limit order"""
         response = self.market.sell(amount, price)
         if response and "code" in response:
-            logging.warn("sell ex:%s", response)
+            logging.warning("sell ex:%s", response)
             return False
         if not response:
             return response
@@ -58,7 +58,7 @@ class PrivateHuobiCNY(Market):
         response = self.market.orderInfo(order_id)
 
         if response and "code" in response:
-            logging.warn(response)
+            logging.warning(response)
             return False
         if not response:
             return response
@@ -85,7 +85,7 @@ class PrivateHuobiCNY(Market):
         if not response:
             return response
         if "code" in response:
-            logging.warn('%s', str(response))
+            logging.warning('%s', str(response))
             return False
         if response['result'] == 'success':
             return True
@@ -96,7 +96,7 @@ class PrivateHuobiCNY(Market):
         try:
             response = self.market.accountInfo()
             if response and "code" in response:
-                logging.warn(response)
+                logging.warning(response)
                 return False
                 raise TradeException(response["message"])
             if response:
@@ -105,7 +105,7 @@ class PrivateHuobiCNY(Market):
                 self.btc_frozen = float(response["frozen_btc_display"])
                 self.cny_frozen = float(response["frozen_cny_display"])
         except Exception as ex:
-            logging.warn("get_info failed :%s" % ex)
+            logging.warning("get_info failed :%s" % ex)
             t, v, tb = sys.exc_info()
             traceback.print_exc()
 
