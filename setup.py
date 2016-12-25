@@ -9,7 +9,7 @@ if sys.version_info < (3,):
     sys.exit(1)
 
 setup(name='bitcoin-arbitrage',
-      packages = ["arbitrage"],
+      packages=["arbitrage"],
       version='0.2',
       description='Bitcoin arbitrage opportunity watcher',
       author='Phil Song',
@@ -18,4 +18,4 @@ setup(name='bitcoin-arbitrage',
       arbitrage=['bin/bitcoin-arbitrage'],
       test_suite='nose.collector',
       tests_require=['nose'],
-  )
+      )

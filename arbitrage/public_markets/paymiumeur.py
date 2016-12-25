@@ -6,6 +6,7 @@ from .market import Market
 
 
 class PaymiumEUR(Market):
+
     def __init__(self):
         super(PaymiumEUR, self).__init__("EUR")
         # bitcoin central maximum call / day = 5000

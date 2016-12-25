@@ -7,9 +7,11 @@ from observers import observer
 
 
 class TestObserver(observer.Observer):
+
     def opportunity(self, profit, volume, buyprice, kask, sellprice, kbid,
                     perc, weighted_buyprice, weighted_sellprice):
         print("Time: %.3f" % profit)
+
 
 def main():
     arbitrer = arbitrage.Arbitrer()

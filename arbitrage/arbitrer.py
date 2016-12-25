@@ -3,27 +3,24 @@
 # Copyright (C) 2013, Maxime Biais <maxime@biais.org>
 # Copyright (C) 2016, Phil Song <songbohr@gmail.com>
 
-import public_markets
-import observers
 import config
 import time
 import logging
-import json
 from concurrent.futures import ThreadPoolExecutor, wait
 import traceback
-
-import re,sys,re
-import string
 import signal
- 
+
+
 def sigint_handler(signum, frame):
     global is_sigint_up
     is_sigint_up = True
-    print ('catched interrupt signal!')
- 
+    print('catched interrupt signal!')
+
 is_sigint_up = False
 
+
 class Arbitrer(object):
+
     def __init__(self):
         self.markets = []
         self.observers = []
@@ -31,7 +28,6 @@ class Arbitrer(object):
         self.init_markets(config.markets)
         self.init_observers(config.observers)
         self.threadpool = ThreadPoolExecutor(max_workers=10)
-
 
     def init_markets(self, _markets):
         logging.debug("_markets:%s" % _markets)
@@ -43,9 +39,11 @@ class Arbitrer(object):
                               market_name + '()')
                 self.markets.append(market)
             except (ImportError, AttributeError) as e:
-                print("%s market name is invalid: Ignored (you should check your config file)" % (market_name))
+                print("%s market name is invalid: Ignored (you should check your config file)" % (
+                    market_name))
                 logging.warn("exception import:%s" % e)
                 traceback.print_exc()
+
     def init_observers(self, _observers):
         logging.debug("_observers:%s" % _observers)
 
@@ -57,9 +55,10 @@ class Arbitrer(object):
                                 observer_name + '()')
                 self.observers.append(observer)
             except (ImportError, AttributeError) as e:
-                print("%s observer name is invalid: Ignored (you should check your config file)" % (observer_name))
+                print("%s observer name is invalid: Ignored (you should check your config file)" % (
+                    observer_name))
                 print(e)
-                
+
     def get_profit_for(self, mi, mj, kask, kbid):
         if self.depths[kask]["asks"][mi]["price"] >= self.depths[kbid]["bids"][mj]["price"]:
             return 0, 0, 0, 0
@@ -86,7 +85,8 @@ class Arbitrer(object):
             if w_buyprice == 0:
                 w_buyprice = price
             else:
-                w_buyprice = (w_buyprice * (buy_total - amount) + price * amount) / buy_total
+                w_buyprice = (w_buyprice * (buy_total - amount) +
+                              price * amount) / buy_total
 
         sell_total = 0
         w_sellprice = 0
@@ -102,7 +102,7 @@ class Arbitrer(object):
             else:
                 w_sellprice = (w_sellprice * (
                     sell_total - amount) + price * amount) / sell_total
-        if abs(sell_total-buy_total) > 0.00001:
+        if abs(sell_total - buy_total) > 0.00001:
             logging.warn("sell_total=%s,buy_total=%s", sell_total, buy_total)
 
         profit = sell_total * w_sellprice - buy_total * w_buyprice
@@ -113,7 +113,7 @@ class Arbitrer(object):
         if len(self.depths[kbid]["bids"]) != 0 and \
            len(self.depths[kask]["asks"]) != 0:
             while self.depths[kask]["asks"][i]["price"] \
-                  < self.depths[kbid]["bids"][0]["price"]:
+                    < self.depths[kbid]["bids"][0]["price"]:
                 if i >= len(self.depths[kask]["asks"]) - 1:
                     break
                 # logging.debug("i:%s,%s/%s,%s/%s", i, kask, self.depths[kask]["asks"][i]["price"],
@@ -125,7 +125,7 @@ class Arbitrer(object):
         if len(self.depths[kask]["asks"]) != 0 and \
            len(self.depths[kbid]["bids"]) != 0:
             while self.depths[kask]["asks"][0]["price"] \
-                  < self.depths[kbid]["bids"][j]["price"]:
+                    < self.depths[kbid]["bids"][j]["price"]:
                 if j >= len(self.depths[kbid]["bids"]) - 1:
                     break
                 # logging.debug("j:%s,%s/%s,%s/%s", j, kask, self.depths[kask]["asks"][0]["price"],
@@ -152,9 +152,9 @@ class Arbitrer(object):
                     best_w_buyprice, best_w_sellprice = (
                         w_buyprice, w_sellprice)
         return best_profit, best_volume, \
-               self.depths[kask]["asks"][best_i]["price"], \
-               self.depths[kbid]["bids"][best_j]["price"], \
-               best_w_buyprice, best_w_sellprice
+            self.depths[kask]["asks"][best_i]["price"], \
+            self.depths[kbid]["bids"][best_j]["price"], \
+            best_w_buyprice, best_w_sellprice
 
     def arbitrage_opportunity(self, kask, ask, kbid, bid):
         perc = (bid["price"] - ask["price"]) / bid["price"] * 100
@@ -162,7 +162,7 @@ class Arbitrer(object):
             weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid)
         if volume == 0 or buyprice == 0:
             return
-        perc2 = (weighted_sellprice-weighted_buyprice)/buyprice * 100
+        perc2 = (weighted_sellprice - weighted_buyprice) / buyprice * 100
         for observer in self.observers:
             observer.opportunity(
                 profit, volume, buyprice, kask, sellprice, kbid,
@@ -227,10 +227,10 @@ class Arbitrer(object):
     def loop(self):
         #
         signal.signal(signal.SIGINT, sigint_handler)
-         
-        #以下那句在windows python2.4不通过,但在freebsd下通过
+
+        # 以下那句在windows python2.4不通过,但在freebsd下通过
         signal.signal(signal.SIGHUP, sigint_handler)
-         
+
         signal.signal(signal.SIGTERM, sigint_handler)
 
         while True:
@@ -239,9 +239,9 @@ class Arbitrer(object):
             self.tickers()
             self.tick()
             time.sleep(config.refresh_rate)
-            
+
             if is_sigint_up:
                 # 中断时需要处理的代码
                 self.clean_up()
-                print ("Exit")
+                print("Exit")
                 break

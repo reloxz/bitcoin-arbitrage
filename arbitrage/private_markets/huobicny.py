@@ -18,13 +18,16 @@ import traceback
 import config
 import logging
 
+
 class PrivateHuobiCNY(Market):
-    def __init__(self,HUOBI_API_KEY=None, HUOBI_SECRET_TOKEN=None):
+
+    def __init__(self, HUOBI_API_KEY=None, HUOBI_SECRET_TOKEN=None):
         super().__init__()
         if HUOBI_API_KEY == None:
             HUOBI_API_KEY = config.HUOBI_API_KEY
             HUOBI_SECRET_TOKEN = config.HUOBI_SECRET_TOKEN
-        self.market = exchange(HUOBI_API_URL, HUOBI_API_KEY, HUOBI_SECRET_TOKEN, 'huobi')
+        self.market = exchange(HUOBI_API_URL, HUOBI_API_KEY,
+                               HUOBI_SECRET_TOKEN, 'huobi')
         self.currency = "CNY"
         self.get_info()
 
@@ -51,12 +54,11 @@ class PrivateHuobiCNY(Market):
 
         return response['id']
 
-
     def _get_order(self, order_id):
         response = self.market.orderInfo(order_id)
 
         if response and "code" in response:
-            logging.warn (response)
+            logging.warn(response)
             return False
         if not response:
             return response
@@ -83,7 +85,7 @@ class PrivateHuobiCNY(Market):
         if not response:
             return response
         if "code" in response:
-            logging.warn ('%s', str(response))
+            logging.warn('%s', str(response))
             return False
         if response['result'] == 'success':
             return True
@@ -102,10 +104,9 @@ class PrivateHuobiCNY(Market):
                 self.cny_balance = float(response["available_cny_display"])
                 self.btc_frozen = float(response["frozen_btc_display"])
                 self.cny_frozen = float(response["frozen_cny_display"])
-        except  Exception as ex:
+        except Exception as ex:
             logging.warn("get_info failed :%s" % ex)
-            t,v,tb = sys.exc_info()
+            t, v, tb = sys.exc_info()
             traceback.print_exc()
 
             return False
-

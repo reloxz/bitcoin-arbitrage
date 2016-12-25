@@ -6,7 +6,9 @@ import urllib.parse
 import json
 from .market import Market
 
+
 class HaobtcCNY(Market):
+
     def __init__(self):
         super().__init__('CNY')
         self.update_rate = 1

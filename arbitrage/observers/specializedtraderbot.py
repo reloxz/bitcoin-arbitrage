@@ -2,16 +2,19 @@ import logging
 import config
 import time
 from .observer import Observer
-from private_markets import haobtccny,huobicny,okcoincny
+from private_markets import haobtccny, huobicny, okcoincny
 
 from .emailer import send_email
 
 
 class SpecializedTraderBot(Observer):
-    def __init__(self):
-        self.haobtc = haobtccny.PrivateHaobtcCNY(config.HAOBTC_API_KEY, config.HAOBTC_SECRET_TOKEN)
 
-        self.okcoin = okcoincny.PrivateOkCoinCNY(config.OKCOIN_API_KEY, config.OKCOIN_SECRET_TOKEN)
+    def __init__(self):
+        self.haobtc = haobtccny.PrivateHaobtcCNY(
+            config.HAOBTC_API_KEY, config.HAOBTC_SECRET_TOKEN)
+
+        self.okcoin = okcoincny.PrivateOkCoinCNY(
+            config.OKCOIN_API_KEY, config.OKCOIN_SECRET_TOKEN)
 
         self.clients = {
             "HaobtcCNY": self.haobtc,
@@ -72,8 +75,10 @@ class SpecializedTraderBot(Observer):
             self.clients[kbid].btc_balance)
         volume = min(volume, max_volume, config.max_tx_volume)
         if volume < config.min_tx_volume:
-            logging.warn("Can't automate this trade, minimum volume transaction not reached %f/%f" % (volume, config.min_tx_volume))
-            logging.info("Balance on %s: %f CNY - Balance on %s: %f BTC" % (kask, self.clients[kask].cny_balance, kbid, self.clients[kbid].btc_balance))
+            logging.warn("Can't automate this trade, minimum volume transaction not reached %f/%f" %
+                         (volume, config.min_tx_volume))
+            logging.info("Balance on %s: %f CNY - Balance on %s: %f BTC" % (kask,
+                                                                            self.clients[kask].cny_balance, kbid, self.clients[kbid].btc_balance))
             return
 
         current_time = time.time()

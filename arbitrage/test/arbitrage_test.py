@@ -50,6 +50,7 @@ depths3 = {
 
 
 class TestArbitrage(unittest.TestCase):
+
     def setUp(self):
         self.arbitrer = arbitrage.Arbitrer()
 

@@ -17,7 +17,9 @@ import time
 import config
 import traceback
 
+
 class ArbitrerCLI:
+
     def __init__(self):
         self.inject_verbose_info()
 
@@ -42,7 +44,7 @@ class ArbitrerCLI:
             self.get_broker_balance(args)
 
     def list_markets(self):
-        logging.debug('list_markets') 
+        logging.debug('list_markets')
         for filename in glob.glob(os.path.join(public_markets.__path__[0], "*.py")):
             module_name = os.path.basename(filename).replace('.py', '')
             if not module_name.startswith('_'):
@@ -69,8 +71,9 @@ class ArbitrerCLI:
             print(market)
 
     def get_broker_balance(self, args):
-        last_email_time = 0           
+        last_email_time = 0
         cny_init = config.cny_init
+        eur_init = config.eur_init
         btc_init = config.btc_init
         price_init = config.price_init
 
@@ -92,55 +95,59 @@ class ArbitrerCLI:
                 btc_frozen = 0
 
                 broker_msg = '\n----------------------------Hedge Fund statistics------------------------------\n'
-                broker_msg += 'datetime\t %s\n\n' % str(datetime.datetime.now())
+                broker_msg += 'datetime\t %s\n\n' % str(
+                    datetime.datetime.now())
                 for account in accounts:
                     cny_balance += account.available_cny
                     btc_balance += account.available_btc
-                    cny_frozen +=  account.frozen_cny
-                    btc_frozen +=  account.frozen_btc
+                    cny_frozen += account.frozen_cny
+                    btc_frozen += account.frozen_btc
 
-                    broker_msg +=  "%s:\t\t %s\n" % (account.exchange, str({"cny_balance": account.available_cny,
-                                               "btc_balance": account.available_btc,
-                                               "cny_frozen": account.frozen_cny,
-                                               "btc_frozen": account.frozen_btc}))
+                    broker_msg += "%s:\t\t %s\n" % (account.exchange, str({"cny_balance": account.available_cny,
+                                                                           "btc_balance": account.available_btc,
+                                                                           "cny_frozen": account.frozen_cny,
+                                                                           "btc_frozen": account.frozen_btc}))
                 broker_msg += '------------------------------------------------------------------------------------\n'
-                broker_msg +=  "%s:\t\t %s\n" % ('Asset0', str({"cny": '%.2f' %cny_init,
-                                               "btc":  '%.2f' %btc_init, "price" : '%.2f' %price_init}))
+                broker_msg += "%s:\t\t %s\n" % ('Asset0', str({"cny": '%.2f' % cny_init,
+                                                               "btc":  '%.2f' % btc_init, "price": '%.2f' % price_init}))
 
-                broker_msg +=  "%s:\t\t %s\n" % ('AssetN', str({"cny": '%.2f' %(cny_balance + cny_frozen),
-                                               "btc":  '%.2f' % (btc_balance+ btc_frozen), "price" : '%.2f' % ticker.bid}))
-                
-                cny_total=(btc_balance+btc_frozen)*ticker.bid + cny_balance+cny_frozen
-                btc_total=btc_balance+btc_frozen + (cny_balance+cny_frozen)/ticker.bid
-                cny_diff = cny_balance+cny_frozen - cny_init
-                btc_diff = btc_balance+btc_frozen - btc_init
+                broker_msg += "%s:\t\t %s\n" % ('AssetN', str({"cny": '%.2f' % (cny_balance + cny_frozen),
+                                                               "btc":  '%.2f' % (btc_balance + btc_frozen), "price": '%.2f' % ticker.bid}))
+
+                cny_total = (btc_balance + btc_frozen) * \
+                    ticker.bid + cny_balance + cny_frozen
+                btc_total = btc_balance + btc_frozen + \
+                    (cny_balance + cny_frozen) / ticker.bid
+                cny_diff = cny_balance + cny_frozen - cny_init
+                btc_diff = btc_balance + btc_frozen - btc_init
 
                 btc_bonus = 0
-                btc_bonus = cny_diff/ ticker.bid
-                cny_bonus = 0 
+                btc_bonus = cny_diff / ticker.bid
+                cny_bonus = 0
                 cny_bonus = btc_diff * ticker.bid
 
-                broker_msg +=  "%s: %s\n" % ('AssetN CNY Base', str({"cny": '%.2f' % cny_init,
-                                                            "btc": '%.2f' % (btc_balance+btc_frozen+btc_bonus)}))
+                broker_msg += "%s: %s\n" % ('AssetN CNY Base', str({"cny": '%.2f' % cny_init,
+                                                                    "btc": '%.2f' % (btc_balance + btc_frozen + btc_bonus)}))
 
+                broker_msg += "%s: %s\n" % ('AssetN BTC Base', str({"cny": '%.2f' % (cny_balance + cny_frozen + cny_bonus),
+                                                                    "btc": '%.2f' % btc_init}))
 
-                broker_msg +=  "%s: %s\n" % ('AssetN BTC Base', str({"cny": '%.2f' % (cny_balance+cny_frozen+cny_bonus),
-                                                            "btc": '%.2f' % btc_init}))
-
-                broker_msg +=  "%s:\t\t %s\n" % ('Profit', str({"profit": '%.2fCNY / %.2fBTC' % (cny_diff+cny_bonus, btc_bonus+btc_diff)}))
+                broker_msg += "%s:\t\t %s\n" % ('Profit', str(
+                    {"profit": '%.2fCNY / %.2fBTC' % (cny_diff + cny_bonus, btc_bonus + btc_diff)}))
 
                 broker_msg += '------------------------------------------------------------------------------------\n'
 
-                broker_msg +=  "%s: %s\n" % ('Asset0 CNY Conv', str({"cny": '%.2f' % (cny_init + btc_init *price_init),
-                                               "btc":  0}))
-                broker_msg +=  "%s: %s\n" % ('Asset0 BTC Conv', str({"cny": 0,
-                                               "btc":  '%.2f' % (btc_init + cny_init/price_init)}))
+                broker_msg += "%s: %s\n" % ('Asset0 CNY Conv', str({"cny": '%.2f' % (cny_init + btc_init * price_init),
+                                                                    "btc":  0}))
+                broker_msg += "%s: %s\n" % ('Asset0 BTC Conv', str({"cny": 0,
+                                                                    "btc":  '%.2f' % (btc_init + cny_init / price_init)}))
 
-                broker_msg +=  "%s: %s\n" % ('AssetN CNY Conv', str({"cny": '%.2f' % cny_total,
-                                                            "btc": 0}))
-                broker_msg +=  "%s: %s\n" % ('AssetN BTC Conv', str({"cny": 0,
-                                                            "btc": '%.2f' % btc_total}))
-                broker_msg +=  "%s:\t %s\n" % ('Profit Conv', str({"profit-conv": '%.2fCNY / %.2fBTC' % (cny_total-(cny_init + btc_init *price_init), btc_total-(btc_init + cny_init/price_init))}))
+                broker_msg += "%s: %s\n" % ('AssetN CNY Conv', str({"cny": '%.2f' % cny_total,
+                                                                    "btc": 0}))
+                broker_msg += "%s: %s\n" % ('AssetN BTC Conv', str({"cny": 0,
+                                                                    "btc": '%.2f' % btc_total}))
+                broker_msg += "%s:\t %s\n" % ('Profit Conv', str({"profit-conv": '%.2fCNY / %.2fBTC' % (
+                    cny_total - (cny_init + btc_init * price_init), btc_total - (btc_init + cny_init / price_init))}))
 
                 broker_msg += '\n------------------------------------------------------------------------------------\n'
 
@@ -149,7 +156,7 @@ class ArbitrerCLI:
                 if not args.status:
                     send_email('Hedge Fund Statistics', broker_msg)
                     break
-                if  time.time() - last_email_time > 60*10:
+                if time.time() - last_email_time > 60 * 10:
                     last_email_time = time.time()
                     send_email('Hedge Fund Statistics', broker_msg)
                 time.sleep(20)
@@ -170,9 +177,11 @@ class ArbitrerCLI:
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
                             level=level)
 
-        Rthandler = RotatingFileHandler('arbitrage.log', maxBytes=100*1024*1024,backupCount=10)
+        Rthandler = RotatingFileHandler(
+            'arbitrage.log', maxBytes=100 * 1024 * 1024, backupCount=10)
         Rthandler.setLevel(level)
-        formatter = logging.Formatter('%(asctime)-12s [%(levelname)s] %(message)s')  
+        formatter = logging.Formatter(
+            '%(asctime)-12s [%(levelname)s] %(message)s')
         Rthandler.setFormatter(formatter)
         logging.getLogger('').addHandler(Rthandler)
 
@@ -189,12 +198,14 @@ class ArbitrerCLI:
                             help="observers, example: -oLogger,Emailer")
         parser.add_argument("-m", "--markets", type=str,
                             help="markets, example: -mHaobtcCNY,Bitstamp")
-        parser.add_argument("-s", "--status", help="status", action="store_true")
+        parser.add_argument("-s", "--status", help="status",
+                            action="store_true")
         parser.add_argument("command", nargs='*', default="watch",
                             help='verb: "watch|replay-history|get-balance|list-public-markets|get-broker-balance"')
         args = parser.parse_args()
         self.init_logger(args)
         self.exec_command(args)
+
 
 def main():
     cli = ArbitrerCLI()

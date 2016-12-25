@@ -4,7 +4,9 @@ from lib.exchange import exchange
 from lib.settings import KRN_API_URL
 import logging
 
+
 class PrivateKraken(Market):
+
     def __init__(self):
         super().__init__()
         if KRN_API_KEY == None:
@@ -78,7 +80,8 @@ class PrivateKraken(Market):
 
         resp_order_id = response['order_id']
         if resp_order_id == -1:
-            logging.warn("cancel order #%s failed, %s" % (order_id, resp_order_id))
+            logging.warn("cancel order #%s failed, %s" %
+                         (order_id, resp_order_id))
             return False
         else:
             logging.debug("Canceled order #%s ok" % (order_id))
@@ -92,7 +95,7 @@ class PrivateKraken(Market):
             return False
         return response
 
-    #FIXME: update exchange responses
+    # FIXME: update exchange responses
     def get_info(self):
         """Get balance"""
         response = self.market.accountInfo()

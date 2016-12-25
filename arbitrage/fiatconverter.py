@@ -21,9 +21,9 @@ class FiatConverter:
             "EUR": 0.8825,
             "CNY": 6.5184,
         }
-        self.update_delay = 60 * 60 # every hour
+        self.update_delay = 60 * 60  # every hour
         self.last_update = 0
-        self.bank_fee = 0.007 # FIXME: bank fee
+        self.bank_fee = 0.007  # FIXME: bank fee
 
     def get_currency_pair(self, code_from, code_to):
         url = self.rate_exchange_url % (code_from, code_to)
@@ -55,9 +55,9 @@ class FiatConverter:
             self.rates[code_to] = rate
 
     def update(self):
-        #CLOSE THE CONVERT
+        # CLOSE THE CONVERT
         return
-        
+
         timediff = time.time() - self.last_update
         if timediff < self.update_delay:
             return

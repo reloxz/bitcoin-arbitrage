@@ -6,6 +6,7 @@ from .market import Market
 
 
 class BtceEUR(Market):
+
     def __init__(self):
         super(BtceEUR, self).__init__("EUR")
         # bitcoin central maximum call / day = 5000

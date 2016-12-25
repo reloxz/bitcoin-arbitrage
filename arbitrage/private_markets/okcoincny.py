@@ -15,13 +15,16 @@ from lib.exchange import exchange
 from lib.settings import OKCOIN_API_URL
 import logging
 
+
 class PrivateOkCoinCNY(Market):
-    def __init__(self,OKCOIN_API_KEY = None, OKCOIN_SECRET_TOKEN = None):
+
+    def __init__(self, OKCOIN_API_KEY=None, OKCOIN_SECRET_TOKEN=None):
         super().__init__()
         if OKCOIN_API_KEY == None:
             OKCOIN_API_KEY = config.OKCOIN_API_KEY
             OKCOIN_SECRET_TOKEN = config.OKCOIN_SECRET_TOKEN
-        self.market = exchange(OKCOIN_API_URL, OKCOIN_API_KEY, OKCOIN_SECRET_TOKEN, 'okcoin')
+        self.market = exchange(
+            OKCOIN_API_URL, OKCOIN_API_KEY, OKCOIN_SECRET_TOKEN, 'okcoin')
 
         self.currency = "CNY"
         self.get_info()
@@ -56,7 +59,7 @@ class PrivateOkCoinCNY(Market):
             return response
 
         if "error_code" in response:
-            logging.warn (response)
+            logging.warn(response)
             return False
 
         order = response['orders'][0]
@@ -83,9 +86,9 @@ class PrivateOkCoinCNY(Market):
             return response
 
         if response and "error_code" in response:
-            logging.warn (response)
+            logging.warn(response)
             return False
-            
+
         if response['result'] == True:
             return True
         else:
@@ -99,9 +102,12 @@ class PrivateOkCoinCNY(Market):
                 logging.warn(response)
                 return False
             else:
-                self.btc_balance = float(response['info']['funds']['free']['btc'])
-                self.cny_balance = float(response['info']['funds']['free']['cny'])
-                self.btc_frozen =  float(response['info']['funds']['freezed']['btc'])
-                self.cny_frozen =  float(response['info']['funds']['freezed']['cny'])
+                self.btc_balance = float(
+                    response['info']['funds']['free']['btc'])
+                self.cny_balance = float(
+                    response['info']['funds']['free']['cny'])
+                self.btc_frozen = float(
+                    response['info']['funds']['freezed']['btc'])
+                self.cny_frozen = float(
+                    response['info']['funds']['freezed']['cny'])
         return response
-        

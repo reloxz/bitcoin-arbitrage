@@ -4,7 +4,9 @@ import urllib.parse
 import json
 from .market import Market
 
+
 class BTCC(Market):
+
     def __init__(self, currency, symbol):
         super().__init__(currency)
         self.symbol = symbol

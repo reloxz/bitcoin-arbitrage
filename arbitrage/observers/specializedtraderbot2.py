@@ -8,16 +8,19 @@ from .emailer import send_email
 
 
 class SpecializedTraderBot2(Observer):
+
     def __init__(self):
-        self.btfenix = bitfenix.PrivateBitfenix()
-        self.kraken = kraken.PrivateKraken()
+        self.btfenix = bitfenix.PrivateBitfenix(
+            config.bitfenix_api_key, config.bitfenix_secret_key)
+        self.kraken = kraken.PrivateKraken(
+            config.kraken_api_key, config.kraken_secret_key)
         self.clients = {
             "Bitfenix": self.btfenix,
             "Kraken": self.kraken,
         }
         self.profit_percentage_thresholds = {  # Graph
             "Bitfenix": {"Kraken": 1.5},
-            "PaymiumEUR": {"Bitfenix": 1},
+            "Kraken": {"Bitfenix": 1},
         }
         self.trade_wait = 60 * 5  # in seconds
         self.last_trade = 0
@@ -70,8 +73,10 @@ class SpecializedTraderBot2(Observer):
             self.clients[kbid].btc_balance)
         volume = min(volume, max_volume, config.max_tx_volume)
         if volume < config.min_tx_volume:
-            logging.warn("Can't automate this trade, minimum volume transaction not reached %f/%f" % (volume, config.min_tx_volume))
-            logging.info("Balance on %s: %f EUR - Balance on %s: %f BTC" % (kask, self.clients[kask].eur_balance, kbid, self.clients[kbid].btc_balance))
+            logging.warn("Can't automate this trade, minimum volume transaction not reached %f/%f" %
+                         (volume, config.min_tx_volume))
+            logging.info("Balance on %s: %f EUR - Balance on %s: %f BTC" % (kask,
+                                                                            self.clients[kask].eur_balance, kbid, self.clients[kbid].btc_balance))
             return
 
         current_time = time.time()

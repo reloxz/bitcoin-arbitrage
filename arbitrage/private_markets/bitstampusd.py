@@ -70,4 +70,3 @@ class PrivateBitstampUSD(Market):
             # todo:
             self.btc_frozen = 0.
             self.cny_frozen = 0.
-            

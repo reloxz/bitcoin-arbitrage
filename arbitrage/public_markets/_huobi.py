@@ -6,7 +6,9 @@ import urllib.parse
 import json
 from .market import Market
 
+
 class Huobi(Market):
+
     def __init__(self, currency, code):
         super().__init__(currency)
         self.code = code

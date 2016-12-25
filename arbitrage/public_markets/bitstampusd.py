@@ -7,6 +7,7 @@ from .market import Market
 
 
 class BitstampUSD(Market):
+
     def __init__(self):
         super(BitstampUSD, self).__init__("USD")
         self.update_rate = 20

@@ -7,7 +7,9 @@ import json
 from .market import Market
 import lib.broker_api as exchange_api
 
+
 class BrokerCNY(Market):
+
     def __init__(self):
         super().__init__('CNY')
         self.update_rate = 1

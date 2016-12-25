@@ -4,7 +4,9 @@ import urllib.parse
 import json
 from .market import Market
 
+
 class Coinbase(Market):
+
     def __init__(self, currency, code):
         super().__init__(currency)
         self.code = code

@@ -4,7 +4,9 @@ import urllib.parse
 import json
 from .market import Market
 
+
 class Gemini(Market):
+
     def __init__(self, currency, symbol):
         super().__init__(currency)
         self.symbol = symbol
@@ -24,7 +26,8 @@ class Gemini(Market):
         l.sort(key=lambda x: float(x['price']), reverse=reverse)
         r = []
         for i in l:
-            r.append({'price': float(i['price']), 'amount': float(i['amount'])})
+            r.append({'price': float(i['price']),
+                      'amount': float(i['amount'])})
         return r
 
     def format_depth(self, depth):

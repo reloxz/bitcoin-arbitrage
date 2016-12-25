@@ -19,7 +19,7 @@ class HistoryDumper(Observer):
             str(int(time.time())) + '.json'
         fp = open(filename, 'w')
         json.dump(depths, fp)
-        logging.debug (depths)
+        logging.debug(depths)
 
     def end_opportunity_finder(self):
         pass

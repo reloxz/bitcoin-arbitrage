@@ -9,7 +9,9 @@ from fiatconverter import FiatConverter
 from utils import log_exception
 import traceback
 
+
 class Market(object):
+
     def __init__(self, currency):
         self.name = self.__class__.__name__
         self.currency = currency
@@ -22,7 +24,7 @@ class Market(object):
         timediff = time.time() - self.depth_updated
         if timediff > self.update_rate:
             self.ask_update_depth()
-            
+
         timediff = time.time() - self.depth_updated
         if timediff > config.market_expiration_time:
             logging.warn('Market: %s order book is expired' % self.name)
@@ -35,7 +37,8 @@ class Market(object):
             return
         for direction in ("asks", "bids"):
             for order in self.depth[direction]:
-                order["price"] = self.fc.convert(order["price"], self.currency, "CNY")
+                order["price"] = self.fc.convert(
+                    order["price"], self.currency, "CNY")
 
     def ask_update_depth(self):
         try:
@@ -60,7 +63,7 @@ class Market(object):
                    'bid': depth['bids'][0]}
         return res
 
-    ## Abstract methods
+    # Abstract methods
     def update_depth(self):
         pass
 

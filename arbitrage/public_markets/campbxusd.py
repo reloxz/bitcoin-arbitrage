@@ -6,6 +6,7 @@ from .market import Market
 
 
 class CampBXUSD(Market):
+
     def __init__(self):
         super(CampBXUSD, self).__init__("USD")
         self.update_rate = 60

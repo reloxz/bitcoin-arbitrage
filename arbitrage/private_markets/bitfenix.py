@@ -4,8 +4,12 @@ from lib.exchange import exchange
 from lib.settings import BTFNX_API_URL
 import logging
 
+# Symbols
+
+
 class PrivateBitfenix(Market):
-    def __init__(self):
+
+    def __init__(self, BTFNX_API_KEY=None, BTFNX_SECRET_TOKEN=None):
         super().__init__()
         if BTFNX_API_KEY == None:
             BTFNX_API_KEY = config.bitfenix_api_key
@@ -14,6 +18,7 @@ class PrivateBitfenix(Market):
                                'btfnx')
         self.currency = "EUR"
         self.get_info()
+
     def _buy(self, amount, price):
         response = self.market.buy(amount, price)
         if response and "code" in response:
@@ -77,7 +82,8 @@ class PrivateBitfenix(Market):
 
         resp_order_id = response['order_id']
         if resp_order_id == -1:
-            logging.warn("cancel order #%s failed, %s" % (order_id, resp_order_id))
+            logging.warn("cancel order #%s failed, %s" %
+                         (order_id, resp_order_id))
             return False
         else:
             logging.debug("Canceled order #%s ok" % (order_id))
@@ -91,7 +97,7 @@ class PrivateBitfenix(Market):
             return False
         return response
 
-    #FIXME: update exchange responses
+    # FIXME: update exchange responses
     def get_info(self):
         """Get balance"""
         response = self.market.accountInfo()
