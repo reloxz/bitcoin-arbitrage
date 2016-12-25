@@ -40,6 +40,17 @@ class exchange:
             }
             signedPayload = self.create_bfnx_payload(payload)
             return requestPost(self.url['new_order'], payload, headers=signedPayload)
+        if self.role == 'krn':
+            payload ={
+                'pair': config.krn_pair,
+                'type': 'buy',
+                'ordertype': type,
+                'volume': amount,
+            }
+            signedPayload = self.create_krn_payload(payload)
+            return requestPost(self.url['new_order'], payload,
+                               headers=signedPayload)
+
         if self.role == 'haobtc' or self.role == 'default':
             payload = {'amount': amount, 'price': price, 'api_key': self.apikey,
                        'secret_key': self.secretToken, 'type': 'buy'}
@@ -125,10 +136,9 @@ class exchange:
         if self.role == 'krn':
             payload ={
                 'pair': config.krn_pair,
+                'type': 'sell',
                 'ordertype': type,
                 'volume': amount,
-                'type': 'sell',
-                'nonce': self._create_nonce()
             }
             signedPayload = self.create_krn_payload(payload)
             return requestPost(self.url['new_order'], payload,
