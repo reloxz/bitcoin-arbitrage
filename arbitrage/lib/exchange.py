@@ -99,7 +99,9 @@ class exchange:
             payload = tradeLoad(payload, self.secretToken, self.role)
             return requestPost(self.url['trade'], payload)
 
-    def sell(self, amount, price, tradePassword=None, tradeid=None, type=None):
+    def sell(self, amount, price, tradePassword=None,
+             tradeid=None, type=None):
+        # BTFNX
         if self.role == 'btfnx':
             payload = {'request': self.trim_uri(self.url['new_order']),
                        'nonce': self._create_nonce(),
@@ -111,13 +113,19 @@ class exchange:
                        }
             signedPayload = self.create_bfnx_payload(payload)
             return requestPost(self.url['new_order'], payload, headers=signedPayload)
-
+        # KRN
+        if self.role = 'krn':
+            payload ={}
+            signedPayload = self.create_krn_payload(payload)
+            return requestPost(self.url['new_order'], payload,
+                               headers=signedPayload)
+        # HAOBTC
         if self.role == 'haobtc' or self.role == 'default':
             payload = {'amount': amount, 'price': price, 'api_key': self.apikey,
                        'secret_key': self.secretToken, 'type': 'sell'}
             payload = tradeLoad(payload, self.secretToken, self.role)
             return requestPost(self.url['trade'], payload)
-
+        # OKCoin
         if self.role == 'okcoin':
             body = requestBody(self.url['trade'], self.url['host'])
             params = {
@@ -136,7 +144,7 @@ class exchange:
                 return json.loads(r)
             else:
                 return None
-
+        # HUOBI
         if self.role == 'huobi':
             timestamp = int(time.time())
             params = {"access_key": self.apikey,

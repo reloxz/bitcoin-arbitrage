@@ -8,13 +8,15 @@ import urllib
 import json
 import hashlib
 import time
+import datetime
 import math
 import decimal
 import hmac
 import base64
 import requests
 import traceback
-
+import config
+import pytz
 
 def md5(str):
     m = hashlib.md5()
@@ -66,15 +68,8 @@ def buildSign(params, secretKey, host='haobtc'):
             sign += key + '=' + str(params[key]) + '&'
         data = sign + 'secret_key=' + secretKey
         return hashlib.md5(data.encode("utf8")).hexdigest().upper()
-
-    if host == 'btfnx':
-        sign = ''
-        sing = sha384(params)
-        return sign
-
     if host == '':
         return
-
 
 def httpGet(url, resource, params=''):
     try:
@@ -128,15 +123,17 @@ def tradeLoad(params, secretKey, host='haobtc'):
 
 
 def fen2yuan(amount, default=100):
-    return (Decimal(amount) / Decimal(default)).quantize(decimal.Decimal('1E-2'))
+    return (decimal.Decimal(amount) / decimal.Decimal(default))\
+        .quantize(decimal.Decimal('1E-2'))
 
 
 def satoshi2btc(amount, default='1E-4'):
-    return (Decimal(amount) / Decimal(COIN)).quantize(decimal.Decimal(default))
+    return (decimal.Decimal(amount) / decimal.Decimal(default))\
+        .quantize(decimal.Decimal(default))
 
 
 def decimal_default(obj):
-    if isinstance(obj, Decimal):
+    if isinstance(obj, decimal.Decimal):
         return float(obj)
     else:
         return str(obj)
@@ -153,7 +150,7 @@ def str2int(num):
 def local_time(time_utc):
     u = int(time.mktime(time_utc.timetuple()))
     time_local = datetime.datetime.fromtimestamp(
-        u, pytz.timezone('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S')
+        u, pytz.timezone(config.local_timezone)).strftime('%Y-%m-%d %H:%M:%S')
     return str(time_local)
 
 

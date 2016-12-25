@@ -124,3 +124,6 @@ BROKER_PORT = 18030
 
 #Added currency
 btfnx_symbol='btcusd'
+
+# Timezone
+local_timezone='Europe/Berlin'
