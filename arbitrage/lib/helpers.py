@@ -22,6 +22,10 @@ def md5(str):
     return m.hexdigest()
 
 
+def sha384(str, secret):
+    m = hmac.new(secret.encode('utf8'), str, hashlib.sha384)
+    return m.hexdigest()
+
 def requestGet(url, payload=''):
     try:
         r = requests.get(url, payload)
@@ -33,9 +37,13 @@ def requestGet(url, payload=''):
         return False
 
 
-def requestPost(url, payload):
+def requestPost(url, payload, headers=None):
     try:
-        r = requests.post(url, payload)
+        if(headers):
+            r = requests.post(url,payload,headers=headers)
+            print(url)
+        else:
+            r = requests.post(url, payload)
         if r and r.status_code == 200:
             return json.loads(r.text)
         else:
@@ -59,8 +67,10 @@ def buildSign(params, secretKey, host='haobtc'):
         data = sign + 'secret_key=' + secretKey
         return hashlib.md5(data.encode("utf8")).hexdigest().upper()
 
-    if host == '':
-        return
+    if host == 'btfnx':
+        sign = ''
+        sing = sha384(params)
+        return sign
 
     if host == '':
         return
@@ -91,8 +101,6 @@ def httpPost(url, resource, params):
         conn.close()
         return data
     except:
-        # except Exception,e:
-        # print(Exception,":",e)
         traceback.print_exc()
         return False
 

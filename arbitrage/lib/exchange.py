@@ -1,37 +1,40 @@
-import math
-import time
-import datetime
-import requests
-import re
-import hashlib
-import logging
-import sys
-import os
 from .helpers import *
-from .settings import *
-
+import config
 
 class exchange:
 
     def __init__(self, url, apiKey, secretToken, role='default'):
         """
-        Role : liquidity , arbitrage , soleTrade
+        FIXME: Change this to something more understandable :)
+        Role : market is role
 
         """
         self.url = url
         self.apikey = apiKey
         self.secretToken = secretToken
         self.role = role
+    def _create_nonce(self):
+        return str(time.time() * 1000000)
 
     def market(self):
         return self.role
 
-    def buy(self, amount, price, tradePassword=None, tradeid=None, type='market'):
+    def trim_uri(self, uri):
+        return uri.split(self.url['host'])[1]
+
+    def buy(self, amount, price, tradePassword=None,
+            tradeid=None, type='market'):
         if self.role == 'btfnx':
-            payload = {'symbol': config.currency, 'amount': amount, 'price': price,
-                       'side': 'buy', 'type': type}
-            payload = tradeLoad(payload, self.secretToken, self.role)
-            return requestPost(self.url['new_order'], payload)
+            payload = {'request': self.trim_uri(self.url['new_order']),
+                       'nonce': self._create_nonce(),
+                       'symbol': config.btfnx_symbol,
+                       'amount': amount,
+                       'price': price,
+                       'side': 'buy',
+                       'type': type
+            }
+            signedPayload = self.create_bfnx_payload(payload)
+            return requestPost(self.url['new_order'], payload, headers=signedPayload)
         if self.role == 'haobtc' or self.role == 'default':
             payload = {'amount': amount, 'price': price, 'api_key': self.apikey,
                        'secret_key': self.secretToken, 'type': 'buy'}
@@ -96,7 +99,13 @@ class exchange:
             payload = tradeLoad(payload, self.secretToken, self.role)
             return requestPost(self.url['trade'], payload)
 
-    def sell(self, amount, price, tradePassword=None, tradeid=None):
+    def sell(self, amount, price, tradePassword=None, tradeid=None, type=None):
+        if self.role == 'btfnx':
+            payload = {'symbol': config.currency, 'amount': amount, 'price': price,
+                       'side': 'buy', 'type': type}
+            payload = tradeLoad(payload, self.secretToken, self.role)
+            return requestPost(self.url['new_order'], payload)
+
         if self.role == 'haobtc' or self.role == 'default':
             payload = {'amount': amount, 'price': price, 'api_key': self.apikey,
                        'secret_key': self.secretToken, 'type': 'sell'}
@@ -147,7 +156,7 @@ class exchange:
             else:
                 return None
 
-    def marketBuy(self, amount):
+    def marketBuy(self, amount, price=None):
         if self.role == 'haobtc' or self.role == 'default':
             payload = {'amount': amount, 'api_key': self.apikey,
                        'secret_key': self.secretToken, 'type': 'buy_market'}
@@ -193,7 +202,7 @@ class exchange:
             else:
                 return None
 
-    def marketSell(self, amount):
+    def marketSell(self, amount, price=None):
         if self.role == 'haobtc' or self.role == 'default':
             payload = {'amount': amount, 'api_key': self.apikey,
                        'secret_key': self.secretToken, 'type': 'sell_market'}
@@ -280,6 +289,10 @@ class exchange:
                 return None
 
     def cancelAll(self):
+        if self.role == 'btfnx':
+            payload = {
+
+            }
         if self.role == 'haobtc' or self.role == 'default':
             payload = {'api_key': self.apikey}
             payload = tradeLoad(payload, self.secretToken, self.role)
@@ -383,7 +396,25 @@ class exchange:
         if self.role == '':
             return
 
+    def create_bfnx_payload(self, payload):
+        j = json.dumps(payload)
+
+        data = base64.standard_b64encode(
+                    j.encode('utf8'))
+
+        return {'X-BFX-APIKEY': self.apikey,
+                'X-BFX-PAYLOAD': data,
+                'X-BFX-SIGNATURE': sha384(data, self.secretToken)
+                }
+
     def accountInfo(self):
+        if self.role == 'btfnx':
+            payload = {
+                'request': self.url['balance'].split(self.url['host'])[1],
+                'nonce': self._create_nonce()
+            }
+            signedPayload = self.create_bfnx_payload(payload)
+            return requestPost(self.url['balance'], payload, headers=signedPayload)
         if self.role == 'haobtc' or self.role == 'default':
             payload = {'api_key': self.apikey}
             payload = tradeLoad(payload, self.secretToken, self.role)

@@ -120,3 +120,7 @@ xmpp_to = "TO@jabber.org"
 # broker thrift server
 BROKER_HOST = "127.0.0.1"
 BROKER_PORT = 18030
+
+
+#Added currency
+currency='EUR'

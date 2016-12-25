@@ -17,15 +17,21 @@ class Market:
         self.usd_balance = 0.
         self.cny_balance = 0.
         self.btc_frozen = 0.
+        self.eur_frozen = 0.
+        self.usd_frozen = 0.
         self.cny_frozen = 0.
         self.fc = FiatConverter()
         self.market = None
 
     def __str__(self):
         return "%s: %s" % (self.name, str({"cny_balance": self.cny_balance,
+                                           "usd_balance": self.usd_balance,
                                            "btc_balance": self.btc_balance,
+                                           "eur_balance": self.eur_balance,
                                            "cny_frozen": self.cny_frozen,
-                                           "btc_frozen": self.btc_frozen}))
+                                           "btc_frozen": self.btc_frozen,
+                                           "usd_frozen": self.usd_frozen,
+                                           "eur_frozen": self.eur_frozen}))
 
     def buy(self, amount, price, client_id=None):
         """Orders are always priced in CNY"""

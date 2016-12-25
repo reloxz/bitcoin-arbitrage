@@ -97,18 +97,24 @@ class PrivateBitfenix(Market):
             return False
         return response
 
-    # FIXME: update exchange responses
     def get_info(self):
         """Get balance"""
         response = self.market.accountInfo()
+        print(response)
         if response:
             if "code" in response:
                 logging.warning("get_info failed %s", response)
                 return False
             else:
-                self.btc_balance = float(response["exchange_btc"])
-                self.cny_balance = float(response["exchange_cny"])
-                self.btc_frozen = float(response["exchange_frozen_btc"])
-                self.cny_frozen = float(response["exchange_frozen_cny"])
-
+                for j in response:
+                    if j["type"] is "exchange":
+                        if j["currency"] is "btc":
+                            self.btc_balance = float(j["amount"])
+                        elif j["currency"] is "usd":
+                            self.usd_balance = float(j["amount"])
+                    elif j["type"] is "trading":
+                        if j["currency"] is "btc":
+                            self.btc_frozen = float(j["amount"])
+                        elif j["currency"] is "usd":
+                            self.usd_frozen = float(j["amount"])
         return response

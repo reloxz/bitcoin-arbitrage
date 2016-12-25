@@ -84,7 +84,10 @@ BTFNX_API_URL = {
 }
 
 KRN_API_URL = {
-
+    'host': 'api.kraken.com',
+    'order_book': 'https://api.kraken.com/0/public/Depth',
+    'balance': 'https://api.kraken.com/0/private/Balance',
+    'new_order': 'https://api.kraken.com/0/private/AddOrder',
 }
 # IMPORT local_settings
 try:
