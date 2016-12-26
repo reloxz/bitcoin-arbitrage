@@ -102,7 +102,7 @@ class PrivateKraken(Market):
                 logging.warning("get_info failed %s", response)
                 return False
             else:
-
+                #FIXME: Put the right repsonse arrays, need balance
                 # self.btc_balance = float(response[""])
                 # self.cny_balance = float(response["exchange_cny"])
                 # self.btc_frozen = float(response["exchange_frozen_btc"])
