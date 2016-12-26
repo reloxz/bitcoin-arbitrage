@@ -14,7 +14,7 @@ class PrivateKraken(Market):
             KRN_SECRET_TOKEN = config.kraken_secret_key
         self.market = exchange(KRN_API_URL,  KRN_API_KEY, KRN_SECRET_TOKEN,
                                'krn')
-        self.currency = "EUR"
+        self.currency = "USD"
         self.get_info()
 
     def _buy(self, amount, price):
@@ -102,10 +102,10 @@ class PrivateKraken(Market):
                 logging.warning("get_info failed %s", response)
                 return False
             else:
+                self.btc_balance = float(response["result"]["XXBT"])
                 #FIXME: Put the right repsonse arrays, need balance
                 # self.btc_balance = float(response[""])
                 # self.cny_balance = float(response["exchange_cny"])
                 # self.btc_frozen = float(response["exchange_frozen_btc"])
                 # self.cny_frozen = float(response["exchange_frozen_cny"])
-                print(response.values())
         return response

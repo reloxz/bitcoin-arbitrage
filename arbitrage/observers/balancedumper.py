@@ -17,8 +17,8 @@ class BalanceDumper(Observer):
 
     def __init__(self):
         self.clients = {
-            # "HaobtcCNY": haobtccny.PrivateHaobtcCNY(config.HAOBTC_API_KEY, config.HAOBTC_SECRET_TOKEN),
-            "BrokerCNY": brokercny.PrivateBrokerCNY(),
+            "Bitfinex": haobtccny.PrivateHaobtcCNY(config.HAOBTC_API_KEY, config.HAOBTC_SECRET_TOKEN),
+            "Kraken": brokercny.PrivateBrokerCNY(),
         }
 
         self.cny_balance = 0
@@ -77,7 +77,6 @@ class BalanceDumper(Observer):
             t, v, tb = sys.exc_info()
             print(t, v)
             traceback.print_exc()
-
             # logging.warning(depths)
             return
 

@@ -41,7 +41,7 @@ class SpecializedTraderBot(Observer):
     def get_min_tradeable_volume(self, buyprice, cny_bal, btc_bal):
         min1 = float(cny_bal) / ((1. + config.balance_margin) * buyprice)
         min2 = float(btc_bal) / (1. + config.balance_margin)
-        return min(min1, min2) * 0.95
+        return min(min1, min2) * 0.951
 
     def update_balance(self):
         for kclient in self.clients:

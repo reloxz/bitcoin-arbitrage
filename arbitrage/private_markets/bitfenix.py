@@ -16,7 +16,7 @@ class PrivateBitfenix(Market):
             BTFNX_SECRET_TOKEN = config.bitfenix_secret_key
         self.market = exchange(BTFNX_API_URL, BTFNX_API_KEY, BTFNX_SECRET_TOKEN,
                                'btfnx')
-        self.currency = "EUR"
+        self.currency = "USD"
         self.get_info()
 
     def _buy(self, amount, price):
@@ -107,13 +107,13 @@ class PrivateBitfenix(Market):
                 return False
             else:
                 for j in response:
-                    if j["type"] is "exchange":
-                        if j["currency"] is "btc":
+                    if j["type"] == "exchange":
+                        if j["currency"] == "btc":
                             self.btc_balance = float(j["amount"])
-                        elif j["currency"] is "usd":
+                        elif j["currency"] == "usd":
                             self.usd_balance = float(j["amount"])
-                    elif j["type"] is "trading":
-                        if j["currency"] is "btc":
+                    elif j["type"] == "trading":
+                        if j["currency"] == "btc":
                             self.btc_frozen = float(j["amount"])
                         elif j["currency"] is "usd":
                             self.usd_frozen = float(j["amount"])

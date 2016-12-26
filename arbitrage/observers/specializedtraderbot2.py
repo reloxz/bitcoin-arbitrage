@@ -19,8 +19,8 @@ class SpecializedTraderBot2(Observer):
             "Kraken": self.kraken,
         }
         self.profit_percentage_thresholds = {  # Graph
-            "Bitfenix": {"Kraken": 1.5},
-            "Kraken": {"Bitfenix": 1},
+            "Bitfenix": {"Kraken": 0.1},
+            "Kraken": {"Bitfenix": 0.1},
         }
         self.trade_wait = 60 * 5  # in seconds
         self.last_trade = 0
@@ -36,8 +36,8 @@ class SpecializedTraderBot2(Observer):
         # Execute only the best (more profitable)
         self.execute_trade(*self.potential_trades[0][1:])
 
-    def get_min_tradeable_volume(self, buyprice, eur_bal, btc_bal):
-        min1 = float(eur_bal) / ((1. + config.balance_margin) * buyprice)
+    def get_min_tradeable_volume(self, buyprice, usd_bal, btc_bal):
+        min1 = float(usd_bal) / ((1. + config.balance_margin) * buyprice)
         min2 = float(btc_bal) / (1. + config.balance_margin)
         return min(min1, min2) * 0.95
 
@@ -69,14 +69,14 @@ class SpecializedTraderBot2(Observer):
 
         # maximum volume transaction with current balances
         max_volume = self.get_min_tradeable_volume(
-            buyprice, self.clients[kask].eur_balance,
+            buyprice, self.clients[kask].usd_balance,
             self.clients[kbid].btc_balance)
         volume = min(volume, max_volume, config.max_tx_volume)
         if volume < config.min_tx_volume:
             logging.warning("Can't automate this trade, minimum volume transaction not reached %f/%f" %
                          (volume, config.min_tx_volume))
-            logging.info("Balance on %s: %f EUR - Balance on %s: %f BTC" % (kask,
-                                                                            self.clients[kask].eur_balance, kbid, self.clients[kbid].btc_balance))
+            logging.info("Balance on %s: %f USD - Balance on %s: %f BTC" % (kask,
+                                                                            self.clients[kask].usd_balance, kbid, self.clients[kbid].btc_balance))
             return
 
         current_time = time.time()

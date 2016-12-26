@@ -34,9 +34,9 @@ class Market:
                                            "eur_frozen": self.eur_frozen}))
 
     def buy(self, amount, price, client_id=None):
-        """Orders are always priced in CNY"""
-        local_currency_price = self.fc.convert(price, "CNY", self.currency)
-        logging.verbose("Buy %f BTC at %f %s (%f CNY) @%s" % (amount,
+        """Orders are always priced in USD"""
+        local_currency_price = self.fc.convert(price, "USD", self.currency)
+        logging.verbose("Buy %f BTC at %f %s (%f USD) @%s" % (amount,
                                                               local_currency_price, self.currency, price, self.name))
         if client_id:
             return self._buy(amount, local_currency_price, client_id)
@@ -44,9 +44,9 @@ class Market:
             return self._buy(amount, local_currency_price)
 
     def sell(self, amount, price, client_id=None):
-        """Orders are always priced in CNY"""
-        local_currency_price = self.fc.convert(price, "CNY", self.currency)
-        logging.verbose("Sell %f BTC at %f %s (%f CNY) @%s" % (amount,
+        """Orders are always priced in USD"""
+        local_currency_price = self.fc.convert(price, "USD", self.currency)
+        logging.verbose("Sell %f BTC at %f %s (%f USD) @%s" % (amount,
                                                                local_currency_price, self.currency, price, self.name))
         if client_id:
             return self._sell(amount, local_currency_price, client_id)
@@ -54,21 +54,21 @@ class Market:
             return self._sell(amount, local_currency_price)
 
     def buy_maker(self, amount, price):
-        """Orders are always priced in CNY"""
+        """Orders are always priced in USD"""
 
-        local_currency_price = self.fc.convert(price, "CNY", self.currency)
+        local_currency_price = self.fc.convert(price, "USD", self.currency)
         local_currency_price = int(local_currency_price)
-        logging.verbose("Buy maker %f BTC at %d %s (%d CNY) @%s" % (amount,
+        logging.verbose("Buy maker %f BTC at %d %s (%d USD) @%s" % (amount,
                                                                     local_currency_price, self.currency, price, self.name))
 
         return self._buy_maker(amount, local_currency_price)
 
     def sell_maker(self, amount, price):
-        """Orders are always priced in CNY"""
-        local_currency_price = self.fc.convert(price, "CNY", self.currency)
+        """Orders are always priced in USD"""
+        local_currency_price = self.fc.convert(price, "USD", self.currency)
         local_currency_price = int(local_currency_price)
 
-        logging.verbose("Sell maker %f BTC at %d %s (%d CNY) @%s" % (amount,
+        logging.verbose("Sell maker %f BTC at %d %s (%d USD) @%s" % (amount,
                                                                      local_currency_price, self.currency, price, self.name))
 
         return self._sell_maker(amount, local_currency_price)

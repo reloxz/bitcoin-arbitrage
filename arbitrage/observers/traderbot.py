@@ -32,7 +32,8 @@ class TraderBot(BasicBot):
         self.perc_thresh = config.perc_thresh
         self.trade_wait = config.trade_wait  # in seconds
         self.last_trade = 0
-        self.init_eur = {'Bitfenix': 5, 'Kraken' : 5}
+        self.init_usd = {'Bitfenix': 5, 'Kraken': 5}
+        # self.init_eur = {'Bitfenix': 5, 'Kraken' : 5}
         self.init_btc = {'Bitfenix': 500, 'Kraken': 500}
         # self.init_btc = {'OKCoinCNY': 500, 'HuobiCNY': 500}
         # self.init_cny = {'OKCoinCNY': 100, 'HuobiCNY': 100}
@@ -63,8 +64,8 @@ class TraderBot(BasicBot):
         # Execute only the best (more profitable)
         self.execute_trade(*self.potential_trades[0][1:])
 
-    def get_min_tradeable_volume(self, buyprice, cny_bal, btc_bal):
-        min1 = float(cny_bal) * (1. - config.balance_margin) / buyprice
+    def get_min_tradeable_volume(self, buyprice, usd_bal, btc_bal):
+        min1 = float(usd_bal) * (1. - config.balance_margin) / buyprice
         min2 = float(btc_bal) * (1. - config.balance_margin)
 
         return min(min1, min2)
@@ -181,21 +182,21 @@ class TraderBot(BasicBot):
                          % (profit, perc, self.reverse_profit_thresh, self.reverse_perc_thresh))
             arbitrage_max_volume = config.reverse_max_tx_volume
 
-            if self.clients[kbid].btc_balance < self.stage0_percent * self.init_btc[kbid] or self.clients[kbid].cny_balance < self.stage0_percent * self.init_cny[kbid]:
+            if self.clients[kbid].btc_balance < self.stage0_percent * self.init_btc[kbid] or self.clients[kbid].usd_balance < self.stage0_percent * self.init_usd[kbid]:
                 logging.info("Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" %
                              (kask, buyprice, kbid, sellprice, volume))
-                logging.info("%s %s btc:%s < %s,cny:%s < %s,  reverse", self.stage0_percent, kbid, self.clients[
-                             kbid].btc_balance,  self.stage0_percent * self.init_btc[kbid], self.clients[kbid].cny_balance, self.stage0_percent * self.init_cny[kbid])
+                logging.info("%s %s btc:%s < %s,usd:%s < %s,  reverse", self.stage0_percent, kbid, self.clients[
+                             kbid].btc_balance,  self.stage0_percent * self.init_btc[kbid], self.clients[kbid].usd_balance, self.stage0_percent * self.init_usd[kbid])
                 ktemp = kbid
                 kbid = kask
                 kask = ktemp
-            elif self.clients[kask].btc_balance < self.stage1_percent * self.init_btc[kask] or self.clients[kask].cny_balance < self.stage1_percent * self.init_cny[kask]:
+            elif self.clients[kask].btc_balance < self.stage1_percent * self.init_btc[kask] or self.clients[kask].usd_balance < self.stage1_percent * self.init_usd[kask]:
                 arbitrage_max_volume = 0.5 * \
                     (config.reverse_max_tx_volume + config.max_tx_volume)
                 logging.info("Buy @%s/%0.2f and sell @%s/%0.2f %0.2f BTC" %
                              (kask, buyprice, kbid, sellprice, volume))
-                logging.info("%s %s btc:%s < %s, cny:%s <%s, go on", self.stage1_percent, kask, self.clients[
-                             kask].btc_balance, self.stage1_percent * self.init_btc[kask], self.clients[kask].cny_balance, self.stage1_percent * self.init_cny[kask])
+                logging.info("%s %s btc:%s < %s, usd:%s <%s, go on", self.stage1_percent, kask, self.clients[
+                             kask].btc_balance, self.stage1_percent * self.init_btc[kask], self.clients[kask].usd_balance, self.stage1_percent * self.init_usd[kask])
             else:
                 logging.debug("wait for higher")
                 return
@@ -214,7 +215,7 @@ class TraderBot(BasicBot):
 
         max_volume = self.get_min_tradeable_volume(buyprice,
                                                    self.clients[
-                                                       kask].cny_balance,
+                                                       kask].usd_balance,
                                                    self.clients[kbid].btc_balance)
         volume = min(volume, max_volume, arbitrage_max_volume)
         if volume < config.min_tx_volume:
@@ -237,8 +238,8 @@ class TraderBot(BasicBot):
                       weighted_sellprice, buyprice, sellprice):
         volume = float('%0.2f' % volume)
 
-        if self.clients[kask].cny_balance < max(volume * buyprice * 10, 31 * buyprice):
-            logging.warning("%s cny is insufficent" % kask)
+        if self.clients[kask].usd_balance < max(volume * buyprice * 10, 31 * buyprice):
+            logging.warning("%s usd is insufficent" % kask)
             return
 
         if self.clients[kbid].btc_balance < max(volume * 10, 31):

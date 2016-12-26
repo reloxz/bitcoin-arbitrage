@@ -9,7 +9,6 @@ class exchange:
         """
         FIXME: Change this to something more understandable :)
         Role : market is role
-
         """
         self.url = url
         self.apikey = apiKey
@@ -114,9 +113,6 @@ class exchange:
                        'secret_key': self.secretToken, 'type': 'sell_maker_only'}
             payload = tradeLoad(payload, self.secretToken, self.role)
             return requestPost(self.url['trade'], payload)
-
-
-
 
     def sell(self, amount, price, tradePassword=None,
              tradeid=None, type='market'):

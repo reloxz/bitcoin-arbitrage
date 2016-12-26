@@ -157,12 +157,13 @@ class Arbitrer(object):
             best_w_buyprice, best_w_sellprice
 
     def arbitrage_opportunity(self, kask, ask, kbid, bid):
-        perc = (bid["price"] - ask["price"]) / bid["price"] * 100
+        perc = ((bid["price"] - ask["price"]) / bid["price"] )* 100
         profit, volume, buyprice, sellprice, weighted_buyprice,\
             weighted_sellprice = self.arbitrage_depth_opportunity(kask, kbid)
         if volume == 0 or buyprice == 0:
             return
-        perc2 = (weighted_sellprice - weighted_buyprice) / buyprice * 100
+        perc2 = (1 - (volume - (profit / buyprice)) / volume) * 100
+        # Chinese guy: perc2 = ((weighted_sellprice - weighted_buyprice) / buyprice) * 100
         for observer in self.observers:
             observer.opportunity(
                 profit, volume, buyprice, kask, sellprice, kbid,
@@ -232,16 +233,19 @@ class Arbitrer(object):
         signal.signal(signal.SIGHUP, sigint_handler)
 
         signal.signal(signal.SIGTERM, sigint_handler)
+        try:
+            while True:
+                self.depths = self.update_depths()
+                # print(self.depths)
+                self.tickers()
+                self.tick()
+                time.sleep(config.refresh_rate)
 
-        while True:
-            self.depths = self.update_depths()
-            # print(self.depths)
-            self.tickers()
-            self.tick()
-            time.sleep(config.refresh_rate)
-
-            if is_sigint_up:
-                # 中断时需要处理的代码
-                self.clean_up()
-                print("Exit")
-                break
+                if is_sigint_up:
+                    # 中断时需要处理的代码
+                    self.clean_up()
+                    print("Exit")
+                    break
+        except KeyboardInterrupt:
+            self.clean_up()
+            print("Exit")
